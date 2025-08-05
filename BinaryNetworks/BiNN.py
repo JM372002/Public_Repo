@@ -2,6 +2,7 @@ import numpy as np
 import struct
 from tqdm import tqdm
 
+np.random.seed(1234)
 
 def load_data(size=True):
     def load_images(filename):
