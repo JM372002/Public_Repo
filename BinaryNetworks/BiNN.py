@@ -2,7 +2,7 @@ import numpy as np
 import struct
 from tqdm import tqdm
 
-# --- Load Data ---
+
 def load_data(size=True):
     def load_images(filename):
         with open(filename, 'rb') as f:
@@ -23,10 +23,10 @@ def load_data(size=True):
         encoded[np.arange(len(labels)), labels] = 1
         return encoded
 
-    train_images = load_images(r'C:\Users\Josh\Desktop\Datasets\MINST\train-images.idx3-ubyte')
-    train_labels = load_labels(r'C:\Users\Josh\Desktop\Datasets\MINST\train-labels.idx1-ubyte')
-    test_images = load_images(r'C:\Users\Josh\Desktop\Datasets\MINST\t10k-images.idx3-ubyte')
-    test_labels = load_labels(r'C:\Users\Josh\Desktop\Datasets\MINST\t10k-labels.idx1-ubyte')
+    train_images = load_images(r'.data\MNIST\raw\train-images-idx3-ubyte')
+    train_labels = load_labels(r'.data\MNIST\raw\train-labels-idx1-ubyte')
+    test_images = load_images(r'.data\MNIST\raw\t10k-images-idx3-ubyte')
+    test_labels = load_labels(r'.data\MNIST\raw\t10k-labels-idx1-ubyte')
 
     if size:
         print(f"Train Images Shape: {train_images.shape}")
@@ -42,14 +42,12 @@ def load_data(size=True):
 
     return X_train, y_train, X_test, y_test
 
-# --- Binary Activation (STE) ---
 def binary_activation(x):
     return np.where(x >= 0, 1.0, -1.0)
 
 def binary_activation_backward(x):
-    return np.ones_like(x)  # Straight-through estimator
+    return np.ones_like(x)
 
-# --- Model ---
 class BinaryNet:
     def __init__(self, input_dim, hidden_dim, output_dim):
         self.W1 = np.random.randn(hidden_dim, input_dim) * 0.1
@@ -79,7 +77,6 @@ class BinaryNet:
         self.W1 -= lr * dW1
         self.b1 -= lr * db1
 
-# --- Loss ---
 def cross_entropy_loss(logits, targets):
     exps = np.exp(logits - np.max(logits, axis=1, keepdims=True))
     probs = exps / np.sum(exps, axis=1, keepdims=True)
@@ -89,11 +86,9 @@ def cross_entropy_loss(logits, targets):
 def grad_cross_entropy(probs, targets):
     return (probs - targets) / targets.shape[0]
 
-# --- Accuracy ---
 def accuracy(preds, targets):
     return np.mean(preds == np.argmax(targets, axis=1))
 
-# --- Train ---
 def train(model, X_train, y_train, lr, batch_size, epoch):
     total_loss = 0
     indices = np.random.permutation(X_train.shape[0])
@@ -111,7 +106,6 @@ def train(model, X_train, y_train, lr, batch_size, epoch):
 
     print(f"Epoch {epoch}: Train Loss = {total_loss / (X_train.shape[0] // batch_size):.4f}")
 
-# --- Test ---
 def test(model, X_test, y_test, epoch):
     logits = model.forward(X_test)
     preds = np.argmax(logits, axis=1)
@@ -119,7 +113,7 @@ def test(model, X_test, y_test, epoch):
     print(f"Epoch {epoch}: Test Accuracy = {acc:.4f}")
     print("\n")
 
-# --- Main ---
+
 if __name__ == "__main__":
     X_train, y_train, X_test, y_test = load_data(size=False)
 

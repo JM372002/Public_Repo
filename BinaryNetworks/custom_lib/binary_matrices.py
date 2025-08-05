@@ -4,7 +4,7 @@ import os
 class BitMatrix:
     def __init__(self, rows, cols):
         # Load the compiled DLL
-        dll_path = os.path.abspath(r"C:\Public_Repo\Public_Repo\BinaryNetworks\bitmatrix.dll")
+        dll_path = os.path.abspath(r"BinaryNetworks\custom_lib\bitmatrix.dll")
         self.lib = ctypes.CDLL(dll_path)
 
         # Declare argument and return types
@@ -61,4 +61,5 @@ if __name__ == "__main__":
 
     dummy = (5 * 13) // 2
     bm.set_random_n_ones(dummy)
-    print(bm.memory_usage())
+    bm.print_matrix()
+    print("Memory usage in bytes:", bm.memory_usage())

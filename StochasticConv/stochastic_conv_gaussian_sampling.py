@@ -7,60 +7,43 @@ from skimage.measure import block_reduce # For max pooling
 np.random.seed(1234)
 
 def load_data(size=True):
-    # Function to load MNIST images
     def load_images(filename):
-        with open(filename, 'rb') as f:  # Use regular 'open()' for non-gz files
-            # First 16 bytes are metadata
+        with open(filename, 'rb') as f:
             magic, num_images, rows, cols = struct.unpack(">IIII", f.read(16))
-            # Rest is the image data, flat array of bytes
             image_data = np.frombuffer(f.read(), dtype=np.uint8)
-            # Reshape into array of images (num_images, rows, cols)
             images = image_data.reshape(num_images, rows, cols)
             return images
 
-    # Function to load MNIST labels
     def load_labels(filename):
-        with open(filename, 'rb') as f:  # Use regular 'open()' for non-gz files
-            # First 8 bytes are metadata
+        with open(filename, 'rb') as f:
             magic, num_labels = struct.unpack(">II", f.read(8))
-            # Rest is the label data
             labels = np.frombuffer(f.read(), dtype=np.uint8)
             return labels
 
     def one_hot_encode_to_array(labels, num_classes=10):
         labels = np.array(labels)
-        # Create a 2D array of zeros
         encoded = np.zeros((len(labels), num_classes), dtype=int)
-        # Place a 1 in the corresponding position for each label
         encoded[np.arange(len(labels)), labels] = 1
         return encoded
 
-    # Load the training and test sets
-    train_images = load_images(r'C:\Users\Josh\Desktop\Datasets\MINST\train-images.idx3-ubyte')
-    train_labels = load_labels(r'C:\Users\Josh\Desktop\Datasets\MINST\train-labels.idx1-ubyte')
-    test_images = load_images(r'C:\Users\Josh\Desktop\Datasets\MINST\t10k-images.idx3-ubyte')
-    test_labels = load_labels(r'C:\Users\Josh\Desktop\Datasets\MINST\t10k-labels.idx1-ubyte')
+    train_images = load_images(r'.data\MNIST\raw\train-images-idx3-ubyte')
+    train_labels = load_labels(r'.data\MNIST\raw\train-labels-idx1-ubyte')
+    test_images = load_images(r'.data\MNIST\raw\t10k-images-idx3-ubyte')
+    test_labels = load_labels(r'.data\MNIST\raw\t10k-labels-idx1-ubyte')
 
-    # Check shapes of the data
-    if size == True:
+    if size:
         print(f"Train Images Shape: {train_images.shape}")
         print(f"Train Labels Shape: {train_labels.shape}")
         print(f"Test Images Shape: {test_images.shape}")
         print(f"Test Labels Shape: {test_labels.shape}")
 
-    # Flatten from (N, 28, 28) to (N, 784) and convert to float
-    X_train = train_images.reshape(-1, 784).astype(np.float64)
-    X_test = test_images.reshape(-1, 784).astype(np.float64)
+    X_train = train_images.reshape(-1, 784).astype(np.float64) / 255.0
+    X_test = test_images.reshape(-1, 784).astype(np.float64) / 255.0
 
-    # Normalize to [0,1] range
-    X_train /= 255.0
-    X_test /= 255.0
-
-    y_train = one_hot_encode_to_array(train_labels, num_classes=10)
-    y_test = one_hot_encode_to_array(test_labels, num_classes=10)
+    y_train = one_hot_encode_to_array(train_labels, 10)
+    y_test = one_hot_encode_to_array(test_labels, 10)
 
     return X_train, y_train, X_test, y_test
-
 
 class StochasticKernelLayer:
     class StochasticKernel:
